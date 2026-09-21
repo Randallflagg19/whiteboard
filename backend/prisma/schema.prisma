@@ -1,0 +1,84 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum TaskStatus {
+  AVAILABLE
+  WAITING
+  SOMEDAY
+  DONE
+}
+
+enum StreakResult {
+  SUCCESS
+  MISSED
+}
+
+model BoardBlock {
+  id        String      @id @default(cuid())
+  title     String
+  emoji     String?
+  dueDate   DateTime?   @db.Date
+  sortOrder Int         @default(0)
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+  tasks     Task[]
+  notes     BlockNote[]
+}
+
+model Task {
+  id            String      @id @default(cuid())
+  title         String
+  note          String?
+  status        TaskStatus  @default(AVAILABLE)
+  isInbox       Boolean     @default(false)
+  isImportant   Boolean     @default(false)
+  isPinned      Boolean     @default(false)
+  availableFrom DateTime?   @db.Date
+  scheduledFor  DateTime?   @db.Date
+  dueDate       DateTime?   @db.Date
+  sortOrder     Int         @default(0)
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  blockId       String?
+  block         BoardBlock? @relation(fields: [blockId], references: [id], onDelete: SetNull)
+}
+
+model BlockNote {
+  id        String     @id @default(cuid())
+  content   String
+  sortOrder Int        @default(0)
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  blockId   String
+  block     BoardBlock @relation(fields: [blockId], references: [id], onDelete: Cascade)
+}
+
+model Streak {
+  id        String        @id @default(cuid())
+  emoji     String
+  title     String?
+  showTitle Boolean       @default(true)
+  sortOrder Int           @default(0)
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+  entries   StreakEntry[]
+}
+
+model StreakEntry {
+  id        String       @id @default(cuid())
+  date      DateTime     @db.Date
+  result    StreakResult
+  note      String?
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+  streakId  String
+  streak    Streak       @relation(fields: [streakId], references: [id], onDelete: Cascade)
+
+  @@unique([streakId, date])
+}
