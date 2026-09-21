@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import type { BoardBlock } from '../generated/prisma/client.js';
 import { PrismaService } from '../prisma/prisma.service.js';
 
@@ -7,6 +7,8 @@ export type CreateBlockInput = {
   emoji?: string | null;
   dueDate?: Date | null;
 };
+
+export type UpdateBlockInput = Partial<CreateBlockInput>;
 
 function toResponse(block: BoardBlock) {
   return {
@@ -31,8 +33,24 @@ export class BlocksService {
     return blocks.map(toResponse);
   }
 
+  async findOne(id: string) {
+    const block = await this.prisma.boardBlock.findUnique({ where: { id } });
+    if (!block) throw new NotFoundException('Block not found');
+    return toResponse(block);
+  }
+
   async create(input: CreateBlockInput) {
     const block = await this.prisma.boardBlock.create({ data: input });
+    return toResponse(block);
+  }
+
+  async update(id: string, input: UpdateBlockInput) {
+    const existing = await this.prisma.boardBlock.findUnique({ where: { id } });
+    if (!existing) throw new NotFoundException('Block not found');
+    const block = await this.prisma.boardBlock.update({
+      where: { id },
+      data: input,
+    });
     return toResponse(block);
   }
 }
