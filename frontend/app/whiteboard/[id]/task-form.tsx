@@ -12,7 +12,7 @@ export function TaskForm({ blockId }: { blockId: string }) {
   }, { error: "" });
 
   return (
-    <form ref={formRef} action={action} className="create-form task-form">
+    <form ref={formRef} action={action} className="composer-form task-form">
       <h2>Новая задача</h2>
       <label>Название<input name="title" required maxLength={200} placeholder="Что нужно сделать?" /></label>
       {state.error && <p className="form-error" role="alert">{state.error}</p>}

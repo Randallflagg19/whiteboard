@@ -35,12 +35,13 @@ export function BottomNav() {
   const onToday = pathname.startsWith("/today");
   const onWhiteboard = pathname.startsWith("/whiteboard");
   const onInbox = pathname.startsWith("/inbox");
+  const onStreak = pathname.startsWith("/streak");
 
   return (
     <nav className="bottom-nav" aria-label="Основная навигация">
       <Link className={`nav-item ${onToday ? "nav-item-active" : ""}`} href="/today" aria-current={onToday ? "page" : undefined}><NavIcon name="today" /><span>Сегодня</span></Link>
       <Link className={`nav-item ${onWhiteboard ? "nav-item-active" : ""}`} href="/whiteboard" aria-current={onWhiteboard ? "page" : undefined}><NavIcon name="whiteboard" /><span>Whiteboard</span></Link>
-      <span className="nav-item nav-item-disabled"><NavIcon name="streak" /><span>Streak</span></span>
+      <Link className={`nav-item ${onStreak ? "nav-item-active" : ""}`} href="/streak" aria-current={onStreak ? "page" : undefined}><NavIcon name="streak" /><span>Streak</span></Link>
       <Link className={`nav-item ${onInbox ? "nav-item-active" : ""}`} href="/inbox" aria-current={onInbox ? "page" : undefined}><NavIcon name="inbox" /><span>Входящие</span></Link>
     </nav>
   );

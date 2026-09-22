@@ -1,19 +1,21 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ApiNotFoundError, getBlock, getTasks } from "../../lib/api";
+import { ApiNotFoundError, getBlock, getBlockNotes, getTasks } from "../../lib/api";
 import { formatBlockDate } from "../../lib/format";
 import { DataError } from "../../ui/data-error";
-import { TaskForm } from "./task-form";
+import { BlockComposer } from "./block-composer";
 import { TaskCheck } from "./task-check";
 import { TaskEditor } from "./task-editor";
 import { BlockDelete } from "./block-delete";
+import { NoteItem } from "./note-item";
 
 export default async function BlockPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   let block;
   let tasks;
+  let notes;
   try {
-    [block, tasks] = await Promise.all([getBlock(id), getTasks(id)]);
+    [block, tasks, notes] = await Promise.all([getBlock(id), getTasks(id), getBlockNotes(id)]);
   } catch (error) {
     if (error instanceof ApiNotFoundError) notFound();
     return <DataError />;
@@ -54,7 +56,11 @@ export default async function BlockPage({ params }: { params: Promise<{ id: stri
           </ul>
         )}
       </section>
-      <TaskForm blockId={id} />
+      {notes.length > 0 && <section className="notes-section">
+        <h2>Заметки</h2>
+        <ul className="block-note-list">{notes.map((note) => <NoteItem key={note.id} blockId={id} note={note} />)}</ul>
+      </section>}
+      <BlockComposer blockId={id} />
       <BlockDelete id={id} title={block.title} taskCount={tasks.length} />
     </div>
   );

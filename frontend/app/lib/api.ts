@@ -26,6 +26,22 @@ export type Task = {
   createdAt: string;
 };
 
+export type BlockNote = {
+  id: string;
+  content: string;
+  blockId: string;
+};
+
+export type Streak = {
+  id: string;
+  emoji: string;
+  title: string | null;
+  showTitle: boolean;
+  createdAt: string;
+  currentCount: number;
+  entries: { date: string; result: "SUCCESS" | "MISSED" }[];
+};
+
 export class ApiNotFoundError extends Error {}
 
 async function getJson<T>(path: string): Promise<T> {
@@ -57,6 +73,17 @@ export async function patchJson<T>(path: string, body: object): Promise<T> {
   return (await response.json()) as T;
 }
 
+export async function putJson<T>(path: string, body: object): Promise<T> {
+  const response = await fetch(`${apiUrl}${path}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+    cache: "no-store",
+  });
+  if (!response.ok) throw new Error(`API request failed: ${response.status}`);
+  return (await response.json()) as T;
+}
+
 export async function deleteRequest(path: string): Promise<void> {
   const response = await fetch(`${apiUrl}${path}`, { method: "DELETE", cache: "no-store" });
   if (!response.ok) throw new Error(`API request failed: ${response.status}`);
@@ -77,4 +104,16 @@ export function getTasks(blockId?: string) {
 
 export function getInboxTasks() {
   return getJson<Task[]>("/tasks?isInbox=true");
+}
+
+export function getBlockNotes(blockId: string) {
+  return getJson<BlockNote[]>(`/blocks/${encodeURIComponent(blockId)}/notes`);
+}
+
+export function getStreaks(from: string, to: string) {
+  return getJson<Streak[]>(`/streaks?from=${encodeURIComponent(from)}&to=${encodeURIComponent(to)}`);
+}
+
+export function getStreak(id: string, from: string, to: string) {
+  return getJson<Streak>(`/streaks/${encodeURIComponent(id)}?from=${encodeURIComponent(from)}&to=${encodeURIComponent(to)}`);
 }
