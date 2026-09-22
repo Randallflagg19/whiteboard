@@ -8,17 +8,17 @@ function readBody(body: unknown): Record<string, unknown> {
   return body as Record<string, unknown>;
 }
 
-function parseDueDate(value: unknown): Date | null {
+function parseDate(value: unknown, field: string): Date | null {
   if (value === null) return null;
   if (typeof value !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(value)) {
-    throw new BadRequestException('dueDate must use YYYY-MM-DD');
+    throw new BadRequestException(`${field} must use YYYY-MM-DD`);
   }
   const date = new Date(`${value}T00:00:00.000Z`);
   if (
     Number.isNaN(date.getTime()) ||
     date.toISOString().slice(0, 10) !== value
   ) {
-    throw new BadRequestException('dueDate must be a valid date');
+    throw new BadRequestException(`${field} must be a valid date`);
   }
   return date;
 }
@@ -38,8 +38,8 @@ function parseFields(input: Record<string, unknown>): UpdateBlockInput {
     }
     fields.emoji = input.emoji;
   }
-  if (Object.hasOwn(input, 'dueDate')) {
-    fields.dueDate = parseDueDate(input.dueDate);
+  for (const key of ['dueDate', 'scheduledFor', 'periodStart', 'periodEnd'] as const) {
+    if (Object.hasOwn(input, key)) fields[key] = parseDate(input[key], key);
   }
 
   return fields;
@@ -56,7 +56,7 @@ export function parseCreateBlock(body: unknown): CreateBlockInput {
 export function parseUpdateBlock(body: unknown): UpdateBlockInput {
   const fields = parseFields(readBody(body));
   if (Object.keys(fields).length === 0) {
-    throw new BadRequestException('Provide title, emoji, or dueDate');
+    throw new BadRequestException('Provide at least one block field');
   }
   return fields;
 }

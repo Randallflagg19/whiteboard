@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   Patch,
@@ -31,5 +32,10 @@ export class TasksController {
   @Patch(':id')
   update(@Param('id') id: string, @Body() body: unknown) {
     return this.tasks.update(id, parseUpdateTask(body));
+  }
+
+  @Delete(':id')
+  delete(@Param('id') id: string) {
+    return this.tasks.delete(id);
   }
 }

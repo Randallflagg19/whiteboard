@@ -56,7 +56,7 @@ export class TasksService {
   async findAll(filters: TaskFilters) {
     const tasks = await this.prisma.task.findMany({
       where: filters,
-      orderBy: [{ sortOrder: 'asc' }, { createdAt: 'asc' }, { id: 'asc' }],
+      orderBy: [{ isPinned: 'desc' }, { sortOrder: 'asc' }, { createdAt: 'asc' }, { id: 'asc' }],
     });
     return tasks.map(toResponse);
   }
@@ -73,5 +73,11 @@ export class TasksService {
     if (input.blockId) await this.ensureBlockExists(input.blockId);
     const task = await this.prisma.task.update({ where: { id }, data: input });
     return toResponse(task);
+  }
+
+  async delete(id: string) {
+    const result = await this.prisma.task.deleteMany({ where: { id } });
+    if (result.count === 0) throw new NotFoundException('Task not found');
+    return { deleted: true };
   }
 }

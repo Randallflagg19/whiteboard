@@ -20,15 +20,18 @@ enum StreakResult {
 }
 
 model BoardBlock {
-  id        String      @id @default(cuid())
-  title     String
-  emoji     String?
-  dueDate   DateTime?   @db.Date
-  sortOrder Int         @default(0)
-  createdAt DateTime    @default(now())
-  updatedAt DateTime    @updatedAt
-  tasks     Task[]
-  notes     BlockNote[]
+  id           String      @id @default(cuid())
+  title        String
+  emoji        String?
+  dueDate      DateTime?   @db.Date
+  scheduledFor DateTime?   @db.Date
+  periodStart  DateTime?   @db.Date
+  periodEnd    DateTime?   @db.Date
+  sortOrder    Int         @default(0)
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+  tasks        Task[]
+  notes        BlockNote[]
 }
 
 model Task {

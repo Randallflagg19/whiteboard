@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { getBlocks, getTasks } from "../lib/api";
-import { formatShortDate } from "../lib/format";
+import { formatBlockDate } from "../lib/format";
 import { DataError } from "../ui/data-error";
 import { BlockForm } from "./block-form";
 
@@ -30,6 +30,7 @@ export default async function WhiteboardPage() {
           {blocks.map((block, index) => {
             const blockTasks = tasks.filter((task) => task.blockId === block.id);
             const done = blockTasks.filter((task) => task.status === "DONE").length;
+            const blockDate = formatBlockDate(block);
             return (
               <Link className={`block-card block-card-${index % 6}`} href={`/whiteboard/${block.id}`} key={block.id}>
                 <div className="block-card-top">
@@ -38,7 +39,7 @@ export default async function WhiteboardPage() {
                 </div>
                 <div className="block-card-bottom">
                   <span className="block-progress"><span className="progress-icon" aria-hidden="true" />{done} / {blockTasks.length}</span>
-                  {block.dueDate && <span className="block-due">до {formatShortDate(block.dueDate)}</span>}
+                  {blockDate && <span className={blockDate.isDeadline ? "block-due" : "block-date"}>{blockDate.text}</span>}
                 </div>
               </Link>
             );

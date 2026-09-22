@@ -72,6 +72,7 @@ button, input { font: inherit; }
 .block-progress { display: inline-flex; align-items: center; gap: 7px; color: #526476; }
 .progress-icon { width: 15px; height: 15px; border: 1.5px solid currentColor; border-radius: 3px; }
 .block-due { color: #d63742; font-size: 15px; font-weight: 700; }
+.block-date { color: #526476; font-size: 15px; font-weight: 700; }
 
 .bottom-nav {
   position: sticky;
@@ -107,15 +108,22 @@ button, input { font: inherit; }
 .progress-track { display: block; flex: 1; height: 9px; overflow: hidden; border: 1px solid #ced8d7; border-radius: 20px; background: #fff; }
 .progress-fill { display: block; height: 100%; border-radius: inherit; background: #64be88; }
 .detail-due { margin: 12px 0 0; color: #d63742; font-size: 15px; font-weight: 700; }
+.detail-date { margin: 12px 0 0; color: #526476; font-size: 15px; font-weight: 700; }
 .tasks-section h2 { margin: 0 0 16px; color: var(--blue); font-size: 16px; font-weight: 700; }
 .task-list { margin: 0; padding: 0; list-style: none; }
 .task-row { display: flex; align-items: flex-start; gap: 12px; padding: 13px 2px; border-bottom: 1px solid #e9edeb; }
-.task-check { display: grid; place-items: center; flex: none; width: 21px; height: 21px; margin-top: 1px; border: 2px solid var(--ink); border-radius: 4px; color: #fff; font-size: 16px; font-weight: 700; line-height: 1; }
+.task-check-form { position: relative; flex: none; margin: 0; }
+.task-check { display: grid; place-items: center; width: 23px; height: 23px; margin: 1px 0 0; padding: 0; border: 2px solid var(--ink); border-radius: 5px; background: #fff; color: #fff; font-size: 16px; font-weight: 700; line-height: 1; cursor: pointer; }
+.task-check:focus-visible { outline: 3px solid var(--blue); outline-offset: 3px; }
+.task-check:disabled { opacity: .5; cursor: wait; }
+.task-check-error { position: absolute; top: 28px; left: 0; z-index: 1; width: 210px; padding: 7px 9px; border: 1px solid #f3c9cc; border-radius: 6px; background: #fff3f4; color: #b92935; font-size: 12px; line-height: 1.3; }
 .task-row-done .task-check { border-color: #59aa78; background: #59aa78; }
 .task-row-done .task-title { color: #708293; text-decoration: line-through; }
 .task-body { flex: 1; min-width: 0; }
 .task-title-line { display: flex; align-items: flex-start; gap: 6px; }
 .task-title { overflow-wrap: anywhere; font-size: 16px; line-height: 1.35; }
+.task-title-button { padding: 0; border: 0; background: none; color: inherit; text-align: left; cursor: pointer; }
+.task-title-button:focus-visible { outline: 3px solid var(--blue); outline-offset: 3px; }
 .task-pin { font-size: 13px; line-height: 1.5; }
 .task-meta { display: flex; flex-wrap: wrap; gap: 5px 11px; margin-top: 5px; color: var(--muted); font-size: 12px; }
 .status { border-radius: 5px; padding: 1px 6px; }
@@ -130,12 +138,40 @@ button, input { font: inherit; }
 .create-form h2 { margin: 0 0 16px; font-size: 17px; }
 .create-form label { display: grid; gap: 6px; min-width: 0; margin-bottom: 14px; font-size: 13px; font-weight: 700; }
 .create-form label span { color: var(--muted); font-weight: 400; }
-.create-form input { width: 100%; min-height: 42px; padding: 9px 11px; border: 1px solid #cbd5d8; border-radius: 9px; background: #fff; color: var(--ink); font-size: 15px; }
+.create-form input, .create-form select { width: 100%; min-height: 42px; padding: 9px 11px; border: 1px solid #cbd5d8; border-radius: 9px; background: #fff; color: var(--ink); font: inherit; font-size: 15px; }
 .create-form input:focus-visible, .create-form button:focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; }
 .form-row { display: grid; grid-template-columns: 1fr 1.5fr; gap: 12px; }
+.form-period { grid-template-columns: 1fr 1fr; }
 .create-form button { min-height: 42px; padding: 9px 16px; border: 0; border-radius: 9px; background: var(--blue); color: #fff; font-weight: 700; cursor: pointer; }
 .create-form button:disabled { opacity: .6; cursor: wait; }
 .form-error { margin: 0 0 12px; color: #c8323d; font-size: 13px; }
+
+.task-edit-form { display: grid; gap: 13px; margin-top: 16px; padding: 16px; border: 1px solid var(--line); border-radius: 12px; background: #fff; }
+.task-edit-form label { display: grid; gap: 6px; min-width: 0; font-size: 13px; font-weight: 700; }
+.task-edit-form input:not([type="checkbox"]), .task-edit-form select, .task-edit-form textarea { width: 100%; min-height: 40px; padding: 8px 10px; border: 1px solid #cbd5d8; border-radius: 8px; background: #fff; color: var(--ink); font: inherit; font-size: 15px; }
+.task-edit-form textarea { resize: vertical; }
+.task-edit-form :is(input, select, textarea, button):focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; }
+.task-edit-dates { display: grid; gap: 12px; }
+.task-edit-flags { display: flex; flex-wrap: wrap; gap: 15px; }
+.task-edit-flags label { display: flex; align-items: center; gap: 7px; font-size: 14px; font-weight: 500; }
+.task-edit-flags input { width: 18px; height: 18px; margin: 0; accent-color: var(--blue); }
+.task-edit-actions { display: flex; flex-wrap: wrap; gap: 10px; }
+.task-edit-actions button { min-height: 40px; padding: 8px 13px; border: 0; border-radius: 8px; background: var(--blue); color: #fff; font: inherit; font-size: 14px; font-weight: 700; cursor: pointer; }
+.task-edit-actions .secondary-button { border: 1px solid #cbd5d8; background: #fff; color: var(--ink); }
+.task-edit-actions button:disabled { opacity: .6; cursor: wait; }
+.task-delete-trigger { margin-top: 9px; padding: 8px 0; border: 0; background: none; color: #bd303b; font: inherit; font-size: 13px; font-weight: 700; cursor: pointer; }
+.task-delete-trigger:focus-visible { outline: 3px solid var(--blue); outline-offset: 3px; }
+.task-delete-trigger:disabled { opacity: .6; cursor: wait; }
+.delete-dialog { width: min(380px, calc(100vw - 36px)); max-height: calc(100vh - 40px); padding: 24px; border: 1px solid var(--line); border-radius: 16px; background: var(--paper); color: var(--ink); box-shadow: 0 20px 70px #14294135; }
+.delete-dialog::backdrop { background: #14294180; }
+.delete-dialog h2 { margin: 0 0 10px; font-size: 20px; }
+.delete-dialog p { margin: 0 0 22px; overflow-wrap: anywhere; color: var(--muted); font-size: 15px; line-height: 1.5; }
+.delete-dialog .form-error { color: #c8323d; }
+.delete-dialog-actions { display: flex; justify-content: flex-end; gap: 10px; }
+.delete-dialog-actions button { min-height: 42px; padding: 9px 14px; border: 1px solid #cbd5d8; border-radius: 9px; background: #fff; color: var(--ink); font: inherit; font-size: 14px; font-weight: 700; cursor: pointer; }
+.delete-dialog-actions .danger-button { border-color: #bd303b; background: #bd303b; color: #fff; }
+.delete-dialog-actions button:focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; }
+.delete-dialog-actions button:disabled { opacity: .6; cursor: wait; }
 
 @media (min-width: 700px) {
   .app-shell { min-height: calc(100vh - 40px); margin: 20px auto; border: 1px solid #ece9e1; border-radius: 28px; overflow: clip; }

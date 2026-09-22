@@ -1,16 +1,11 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ApiNotFoundError, getBlock, getTasks } from "../../lib/api";
-import { formatShortDate } from "../../lib/format";
+import { formatBlockDate } from "../../lib/format";
 import { DataError } from "../../ui/data-error";
 import { TaskForm } from "./task-form";
-
-const statusLabels = {
-  AVAILABLE: "Доступно",
-  WAITING: "Жду",
-  SOMEDAY: "Когда-нибудь",
-  DONE: "Готово",
-} as const;
+import { TaskCheck } from "./task-check";
+import { TaskEditor } from "./task-editor";
 
 export default async function BlockPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -25,6 +20,7 @@ export default async function BlockPage({ params }: { params: Promise<{ id: stri
 
   const done = tasks.filter((task) => task.status === "DONE").length;
   const progress = tasks.length ? (done / tasks.length) * 100 : 0;
+  const blockDate = formatBlockDate(block);
 
   return (
     <div className="page-content detail-page">
@@ -39,7 +35,7 @@ export default async function BlockPage({ params }: { params: Promise<{ id: stri
           <span className="progress-track"><span className="progress-fill" style={{ width: `${progress}%` }} /></span>
           <strong>{done} / {tasks.length}</strong>
         </div>
-        {block.dueDate && <p className="detail-due">до {formatShortDate(block.dueDate)}</p>}
+        {blockDate && <p className={blockDate.isDeadline ? "detail-due" : "detail-date"}>{blockDate.text}</p>}
       </section>
 
       <section className="tasks-section">
@@ -50,20 +46,8 @@ export default async function BlockPage({ params }: { params: Promise<{ id: stri
           <ul className="task-list">
             {tasks.map((task) => (
               <li className={`task-row ${task.status === "DONE" ? "task-row-done" : ""}`} key={task.id}>
-                <span className="task-check" aria-hidden="true">{task.status === "DONE" ? "✓" : ""}</span>
-                <div className="task-body">
-                  <div className="task-title-line">
-                    <span className="task-title">{task.title}</span>
-                    {task.isPinned && <span className="task-pin" title="Закреплено">📌</span>}
-                  </div>
-                  <div className="task-meta">
-                    {task.status !== "AVAILABLE" && <span className={`status status-${task.status.toLowerCase()}`}>{statusLabels[task.status]}</span>}
-                    {task.scheduledFor && <span>на {formatShortDate(task.scheduledFor)}</span>}
-                    {task.dueDate && <span>до {formatShortDate(task.dueDate)}</span>}
-                    {task.isImportant && <span className="important-label">Важно</span>}
-                  </div>
-                  {task.note && <p className="task-note">{task.note}</p>}
-                </div>
+                <TaskCheck blockId={id} taskId={task.id} title={task.title} isDone={task.status === "DONE"} />
+                <TaskEditor blockId={id} task={task} />
               </li>
             ))}
           </ul>

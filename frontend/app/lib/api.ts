@@ -5,6 +5,9 @@ export type BoardBlock = {
   title: string;
   emoji: string | null;
   dueDate: string | null;
+  scheduledFor: string | null;
+  periodStart: string | null;
+  periodEnd: string | null;
   sortOrder: number;
 };
 
@@ -40,6 +43,22 @@ export async function postJson<T>(path: string, body: object): Promise<T> {
   });
   if (!response.ok) throw new Error(`API request failed: ${response.status}`);
   return (await response.json()) as T;
+}
+
+export async function patchJson<T>(path: string, body: object): Promise<T> {
+  const response = await fetch(`${apiUrl}${path}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+    cache: "no-store",
+  });
+  if (!response.ok) throw new Error(`API request failed: ${response.status}`);
+  return (await response.json()) as T;
+}
+
+export async function deleteRequest(path: string): Promise<void> {
+  const response = await fetch(`${apiUrl}${path}`, { method: "DELETE", cache: "no-store" });
+  if (!response.ok) throw new Error(`API request failed: ${response.status}`);
 }
 
 export function getBlocks() {
