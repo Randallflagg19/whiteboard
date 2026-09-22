@@ -4,7 +4,7 @@ import { useActionState } from "react";
 import { toggleTaskDone } from "./actions";
 
 export function TaskCheck({ blockId, taskId, title, isDone }: {
-  blockId: string;
+  blockId: string | null;
   taskId: string;
   title: string;
   isDone: boolean;

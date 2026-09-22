@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Patch, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/common';
 import { BlocksService } from './blocks.service.js';
 import { parseCreateBlock, parseUpdateBlock } from './blocks.validation.js';
 
@@ -24,5 +24,10 @@ export class BlocksController {
   @Patch(':id')
   update(@Param('id') id: string, @Body() body: unknown) {
     return this.blocks.update(id, parseUpdateBlock(body));
+  }
+
+  @Delete(':id')
+  delete(@Param('id') id: string) {
+    return this.blocks.delete(id);
   }
 }

@@ -12,8 +12,9 @@ const statusLabels = {
   DONE: "Готово",
 } as const;
 
-export function TaskEditor({ blockId, task }: { blockId: string; task: Task }) {
+export function TaskEditor({ blockId, task }: { blockId: string | null; task: Task }) {
   const [open, setOpen] = useState(false);
+  const [dateType, setDateType] = useState(task.scheduledFor ? "day" : task.periodStart ? "period" : "none");
   const deleteDialog = useRef<HTMLDialogElement>(null);
   const [state, action, pending] = useActionState(
     async (previous: { error: string; saved: boolean }, data: FormData) => {
@@ -39,7 +40,7 @@ export function TaskEditor({ blockId, task }: { blockId: string; task: Task }) {
       <div className="task-meta">
         {task.status !== "AVAILABLE" && <span className={`status status-${task.status.toLowerCase()}`}>{statusLabels[task.status]}</span>}
         {task.scheduledFor && <span>на {formatShortDate(task.scheduledFor)}</span>}
-        {task.dueDate && <span>до {formatShortDate(task.dueDate)}</span>}
+        {task.periodStart && task.periodEnd && <span>{formatShortDate(task.periodStart)} — {formatShortDate(task.periodEnd)}</span>}
         {task.isImportant && <span className="important-label">Важно</span>}
       </div>
       {task.note && <p className="task-note">{task.note}</p>}
@@ -53,11 +54,20 @@ export function TaskEditor({ blockId, task }: { blockId: string; task: Task }) {
             </select>
           </label>
           <label>Заметка<textarea name="note" rows={3} defaultValue={task.note ?? ""} /></label>
-          <div className="task-edit-dates">
-            <label>Доступно с<input name="availableFrom" type="date" defaultValue={task.availableFrom ?? ""} /></label>
-            <label>На день<input name="scheduledFor" type="date" defaultValue={task.scheduledFor ?? ""} /></label>
-            <label>Срок<input name="dueDate" type="date" defaultValue={task.dueDate ?? ""} /></label>
-          </div>
+          <label>Дата
+            <select name="dateType" value={dateType} onChange={(event) => setDateType(event.target.value)}>
+              <option value="none">Без даты</option>
+              <option value="day">На день</option>
+              <option value="period">Период</option>
+            </select>
+          </label>
+          {dateType === "day" && <label>На день<input name="date" type="date" required defaultValue={task.scheduledFor ?? ""} /></label>}
+          {dateType === "period" && <div className="task-edit-dates">
+            <label>Начало<input name="periodStart" type="date" required defaultValue={task.periodStart ?? ""} /></label>
+            <label>Конец<input name="periodEnd" type="date" required defaultValue={task.periodEnd ?? ""} /></label>
+          </div>}
+          {dateType !== "day" && <input name="date" type="hidden" value="" />}
+          {dateType !== "period" && <><input name="periodStart" type="hidden" value="" /><input name="periodEnd" type="hidden" value="" /></>}
           <div className="task-edit-flags">
             <label><input name="isImportant" type="checkbox" defaultChecked={task.isImportant} /> Важно</label>
             <label><input name="isPinned" type="checkbox" defaultChecked={task.isPinned} /> Закрепить</label>

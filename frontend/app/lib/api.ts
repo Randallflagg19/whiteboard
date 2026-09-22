@@ -19,10 +19,11 @@ export type Task = {
   isInbox: boolean;
   isImportant: boolean;
   isPinned: boolean;
-  availableFrom: string | null;
   scheduledFor: string | null;
-  dueDate: string | null;
+  periodStart: string | null;
+  periodEnd: string | null;
   blockId: string | null;
+  createdAt: string;
 };
 
 export class ApiNotFoundError extends Error {}
@@ -72,4 +73,8 @@ export function getBlock(id: string) {
 export function getTasks(blockId?: string) {
   const query = blockId ? `?blockId=${encodeURIComponent(blockId)}` : "";
   return getJson<Task[]>(`/tasks${query}`);
+}
+
+export function getInboxTasks() {
+  return getJson<Task[]>("/tasks?isInbox=true");
 }

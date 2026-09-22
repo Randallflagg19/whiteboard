@@ -21,12 +21,12 @@ export async function createTask(blockId: string, _state: FormState, formData: F
 }
 
 export async function toggleTaskDone(
-  blockId: string,
+  blockId: string | null,
   taskId: string,
   isDone: boolean,
   _state: FormState,
 ): Promise<FormState> {
-  if (!blockId || !taskId || typeof isDone !== "boolean") {
+  if (!taskId || typeof isDone !== "boolean") {
     return { ..._state, error: "Не удалось найти задачу." };
   }
 
@@ -38,15 +38,16 @@ export async function toggleTaskDone(
     return { ..._state, error: "Не удалось сохранить статус. Попробуйте снова." };
   }
 
-  revalidatePath(`/whiteboard/${blockId}`);
+  if (blockId) revalidatePath(`/whiteboard/${blockId}`);
   revalidatePath("/whiteboard");
+  revalidatePath("/today");
   return { ..._state, error: "" };
 }
 
 export type EditTaskState = { error: string; saved: boolean };
 
 export async function updateTask(
-  blockId: string,
+  blockId: string | null,
   taskId: string,
   state: EditTaskState,
   formData: FormData,
@@ -54,26 +55,31 @@ export async function updateTask(
   const title = formData.get("title");
   const note = formData.get("note");
   const status = formData.get("status");
-  const availableFrom = formData.get("availableFrom");
-  const scheduledFor = formData.get("scheduledFor");
-  const dueDate = formData.get("dueDate");
+  const dateType = formData.get("dateType");
+  const date = formData.get("date");
+  const periodStart = formData.get("periodStart");
+  const periodEnd = formData.get("periodEnd");
 
-  if (!blockId || !taskId || typeof title !== "string" || !title.trim()) {
+  if (!taskId || typeof title !== "string" || !title.trim()) {
     return { error: "Введите название задачи.", saved: false };
   }
   if (
     typeof note !== "string" ||
-    typeof availableFrom !== "string" ||
-    typeof scheduledFor !== "string" ||
-    typeof dueDate !== "string" ||
+    typeof date !== "string" ||
+    typeof periodStart !== "string" ||
+    typeof periodEnd !== "string" ||
+    !["none", "day", "period"].includes(String(dateType)) ||
     !["AVAILABLE", "WAITING", "SOMEDAY", "DONE"].includes(String(status))
   ) {
     return { error: "Проверьте поля задачи.", saved: false };
   }
-  for (const date of [availableFrom, scheduledFor, dueDate]) {
-    if (!date) continue;
-    const parsed = new Date(`${date}T00:00:00Z`);
-    if (!/^\d{4}-\d{2}-\d{2}$/.test(date) || Number.isNaN(parsed.getTime()) || parsed.toISOString().slice(0, 10) !== date) {
+  if (dateType === "day" && !date) return { ...state, error: "Укажите день задачи.", saved: false };
+  if (dateType === "period" && (!periodStart || !periodEnd || periodStart > periodEnd)) {
+    return { ...state, error: "Проверьте период задачи.", saved: false };
+  }
+  for (const value of dateType === "day" ? [date] : dateType === "period" ? [periodStart, periodEnd] : []) {
+    const parsed = new Date(`${value}T00:00:00Z`);
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(value) || Number.isNaN(parsed.getTime()) || parsed.toISOString().slice(0, 10) !== value) {
       return { ...state, error: "Проверьте даты задачи.", saved: false };
     }
   }
@@ -83,9 +89,9 @@ export async function updateTask(
       title: title.trim(),
       note: note.trim() || null,
       status,
-      availableFrom: availableFrom || null,
-      scheduledFor: scheduledFor || null,
-      dueDate: dueDate || null,
+      scheduledFor: dateType === "day" ? date : null,
+      periodStart: dateType === "period" ? periodStart : null,
+      periodEnd: dateType === "period" ? periodEnd : null,
       isImportant: formData.get("isImportant") === "on",
       isPinned: formData.get("isPinned") === "on",
     });
@@ -93,20 +99,22 @@ export async function updateTask(
     return { error: "Не удалось сохранить задачу. Попробуйте снова.", saved: false };
   }
 
-  revalidatePath(`/whiteboard/${blockId}`);
+  if (blockId) revalidatePath(`/whiteboard/${blockId}`);
   revalidatePath("/whiteboard");
+  revalidatePath("/today");
   return { error: "", saved: true };
 }
 
-export async function deleteTask(blockId: string, taskId: string, state: FormState): Promise<FormState> {
-  if (!blockId || !taskId) return { ...state, error: "Не удалось найти задачу." };
+export async function deleteTask(blockId: string | null, taskId: string, state: FormState): Promise<FormState> {
+  if (!taskId) return { ...state, error: "Не удалось найти задачу." };
   try {
     await deleteRequest(`/tasks/${encodeURIComponent(taskId)}`);
   } catch {
     return { ...state, error: "Не удалось удалить задачу. Попробуйте снова." };
   }
 
-  revalidatePath(`/whiteboard/${blockId}`);
+  if (blockId) revalidatePath(`/whiteboard/${blockId}`);
   revalidatePath("/whiteboard");
+  revalidatePath("/today");
   return { ...state, error: "" };
 }

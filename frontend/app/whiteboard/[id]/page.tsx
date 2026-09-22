@@ -6,6 +6,7 @@ import { DataError } from "../../ui/data-error";
 import { TaskForm } from "./task-form";
 import { TaskCheck } from "./task-check";
 import { TaskEditor } from "./task-editor";
+import { BlockDelete } from "./block-delete";
 
 export default async function BlockPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -54,6 +55,7 @@ export default async function BlockPage({ params }: { params: Promise<{ id: stri
         )}
       </section>
       <TaskForm blockId={id} />
+      <BlockDelete id={id} title={block.title} taskCount={tasks.length} />
     </div>
   );
 }

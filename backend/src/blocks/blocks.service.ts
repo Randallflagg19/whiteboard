@@ -62,6 +62,17 @@ export class BlocksService {
     return toResponse(block);
   }
 
+  async delete(id: string) {
+    return this.prisma.$transaction(async (transaction) => {
+      const block = await transaction.boardBlock.findUnique({ where: { id } });
+      if (!block) throw new NotFoundException('Block not found');
+
+      await transaction.task.deleteMany({ where: { blockId: id } });
+      await transaction.boardBlock.delete({ where: { id } });
+      return { deleted: true };
+    });
+  }
+
   private validateDates(input: UpdateBlockInput) {
     const modes = Number(Boolean(input.dueDate)) + Number(Boolean(input.scheduledFor)) + Number(Boolean(input.periodStart || input.periodEnd));
     if (modes > 1) throw new BadRequestException('Choose only one block date type');

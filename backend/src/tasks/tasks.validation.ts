@@ -62,7 +62,7 @@ function parseFields(input: Record<string, unknown>): UpdateTaskInput {
       fields[key] = input[key];
     }
   }
-  for (const key of ['availableFrom', 'scheduledFor', 'dueDate'] as const) {
+  for (const key of ['scheduledFor', 'periodStart', 'periodEnd'] as const) {
     if (Object.hasOwn(input, key)) {
       fields[key] = parseDate(input[key], key);
     }

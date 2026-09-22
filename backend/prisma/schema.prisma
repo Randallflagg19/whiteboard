@@ -42,9 +42,9 @@ model Task {
   isInbox       Boolean     @default(false)
   isImportant   Boolean     @default(false)
   isPinned      Boolean     @default(false)
-  availableFrom DateTime?   @db.Date
   scheduledFor  DateTime?   @db.Date
-  dueDate       DateTime?   @db.Date
+  periodStart   DateTime?   @db.Date
+  periodEnd     DateTime?   @db.Date
   sortOrder     Int         @default(0)
   createdAt     DateTime    @default(now())
   updatedAt     DateTime    @updatedAt

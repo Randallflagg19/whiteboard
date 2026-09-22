@@ -89,6 +89,7 @@ button, input { font: inherit; }
 .nav-item { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; text-align: center; font-size: 11px; font-weight: 600; white-space: nowrap; }
 .nav-item svg { width: 22px; height: 22px; }
 .nav-item-active { color: var(--blue); }
+.nav-item:not(.nav-item-active):not(.nav-item-disabled) { color: #65748a; }
 .nav-item-disabled { color: #8896a8; }
 
 .empty-state, .data-error { margin-top: 54px; padding: 32px 24px; border: 1px solid var(--line); border-radius: 18px; text-align: center; background: #fff; }
@@ -172,6 +173,26 @@ button, input { font: inherit; }
 .delete-dialog-actions .danger-button { border-color: #bd303b; background: #bd303b; color: #fff; }
 .delete-dialog-actions button:focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; }
 .delete-dialog-actions button:disabled { opacity: .6; cursor: wait; }
+.block-delete-section { margin-top: 20px; padding-top: 14px; border-top: 1px solid var(--line); }
+
+.inbox-capture-form { margin: 0; }
+.inbox-capture-form label { margin-bottom: 12px; }
+.inbox-empty { margin-top: 24px; }
+.inbox-list { display: grid; gap: 12px; margin: 24px 0 0; padding: 0; list-style: none; }
+.inbox-item { padding: 17px; border: 1px solid var(--line); border-radius: 14px; background: #fff; }
+.inbox-item h2 { margin: 0; overflow-wrap: anywhere; font-size: 17px; font-weight: 600; }
+.inbox-item .task-note { margin-top: 8px; }
+.inbox-process-form { display: grid; gap: 9px; margin-top: 16px; }
+.inbox-process-form label { display: grid; gap: 6px; font-size: 13px; font-weight: 700; }
+.inbox-process-form select { width: 100%; min-height: 42px; padding: 9px 10px; border: 1px solid #cbd5d8; border-radius: 9px; background: #fff; color: var(--ink); font: inherit; font-size: 15px; }
+.inbox-process-form button { justify-self: start; min-height: 40px; padding: 8px 14px; border: 0; border-radius: 9px; background: var(--blue); color: #fff; font: inherit; font-size: 14px; font-weight: 700; cursor: pointer; }
+.inbox-process-form :is(select, button):focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; }
+.inbox-process-form button:disabled { opacity: .6; cursor: wait; }
+
+.today-date { margin: 8px 0 0; color: var(--muted); font-size: 15px; }
+.today-list { margin-top: 24px; }
+.today-task-content { flex: 1; min-width: 0; }
+.today-block-name { display: block; margin: 0 0 4px; color: var(--muted); font-size: 12px; }
 
 @media (min-width: 700px) {
   .app-shell { min-height: calc(100vh - 40px); margin: 20px auto; border: 1px solid #ece9e1; border-radius: 28px; overflow: clip; }

@@ -1,4 +1,7 @@
+"use client";
+
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 type IconName = "today" | "whiteboard" | "streak" | "inbox";
 
@@ -28,12 +31,17 @@ function NavIcon({ name }: { name: IconName }) {
 }
 
 export function BottomNav() {
+  const pathname = usePathname();
+  const onToday = pathname.startsWith("/today");
+  const onWhiteboard = pathname.startsWith("/whiteboard");
+  const onInbox = pathname.startsWith("/inbox");
+
   return (
     <nav className="bottom-nav" aria-label="Основная навигация">
-      <span className="nav-item nav-item-disabled"><NavIcon name="today" /><span>Сегодня</span></span>
-      <Link className="nav-item nav-item-active" href="/whiteboard" aria-current="page"><NavIcon name="whiteboard" /><span>Whiteboard</span></Link>
+      <Link className={`nav-item ${onToday ? "nav-item-active" : ""}`} href="/today" aria-current={onToday ? "page" : undefined}><NavIcon name="today" /><span>Сегодня</span></Link>
+      <Link className={`nav-item ${onWhiteboard ? "nav-item-active" : ""}`} href="/whiteboard" aria-current={onWhiteboard ? "page" : undefined}><NavIcon name="whiteboard" /><span>Whiteboard</span></Link>
       <span className="nav-item nav-item-disabled"><NavIcon name="streak" /><span>Streak</span></span>
-      <span className="nav-item nav-item-disabled"><NavIcon name="inbox" /><span>Входящие</span></span>
+      <Link className={`nav-item ${onInbox ? "nav-item-active" : ""}`} href="/inbox" aria-current={onInbox ? "page" : undefined}><NavIcon name="inbox" /><span>Входящие</span></Link>
     </nav>
   );
 }
